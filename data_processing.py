@@ -51,7 +51,8 @@ class Table:
             if condition(item1):
                 filtered_table.table.append(item1)
         return filtered_table
-    
+
+
     def aggregate(self, function, aggregation_key):
         temps = []
         for item1 in self.table:
