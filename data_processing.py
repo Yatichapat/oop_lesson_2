@@ -15,6 +15,24 @@ with open(os.path.join(__location__, 'Countries.csv')) as f:
     for r in rows:
         countries.append(dict(r))
 
+players = []
+with open(os.path.join(__location__, 'Players.csv')) as f:
+    rows = csv.DictReader(f)
+    for r in rows:
+        players.append(dict(r))
+
+teams = []
+with open(os.path.join(__location__, 'Teams.csv')) as f:
+    rows = csv.DictReader(f)
+    for r in rows:
+        teams.append(dict(r))
+
+titanic = []
+with open(os.path.join(__location__, 'Titanic.csv')) as f:
+    rows = csv.DictReader(f)
+    for r in rows:
+        titanic.append(dict(r))
+
 
 class DB:
     def __init__(self):
@@ -31,8 +49,6 @@ class DB:
 
 
 import copy
-
-
 class Table:
     def __init__(self, table_name, table):
         self.table_name = table_name
@@ -78,52 +94,78 @@ class Table:
 
 table1 = Table('cities', cities)
 table2 = Table('countries', countries)
+table3 = Table('players', players)
+table4 = Table('teams', teams)
+table5 = Table('titanic', titanic)
 my_DB = DB()
 my_DB.insert(table1)
 my_DB.insert(table2)
+my_DB.insert(table3)
 my_table1 = my_DB.search('cities')
+my_table3 = my_DB.search('players')
+# print(my_table3.table_name, my_table3.table)
 
-print("Test filter: only filtering out cities in Italy")
-my_table1_filtered = my_table1.filter(lambda x: x['country'] == 'Italy')
-print(my_table1_filtered)
-print()
+print(
+    'Test select:  player on a team with “ia” in the team name played less than 200 minutes and made more than 100 pass')
 
-print("Test select: only displaying two fields, city and latitude, for cities in Italy")
-my_table1_selected = my_table1_filtered.select(['city', 'latitude'])
-print(my_table1_selected)
-print()
-
-print("Calculting the average temperature without using aggregate for cities in Italy")
-temps = []
-for item in my_table1_filtered.table:
-    temps.append(float(item['temperature']))
-print(sum(temps) / len(temps))
+my_table3_filtered = my_table3.filter(lambda x: int(x['minutes']) < 200).filter(
+    lambda x: int(x['passes']) > 100).filter(lambda x: 'ia' in x['team'])
+print(my_table3_filtered)
 print()
 
-print("Calculting the average temperature using aggregate for cities in Italy")
-print(my_table1_filtered.aggregate(lambda x: sum(x) / len(x), 'temperature'))
-print()
+my_table3_selected = my_table3_filtered.select(['surname', 'team', 'position'])
+print(my_table3_selected)
+my_table4_below10 = table4.filter(lambda x: int(x['ranking']) < 10)
+my_table4_above10 = table4.filter(lambda x: int(x['ranking']) >= 10)
+print('The average below 10: ', my_table4_below10.aggregate(lambda x: sum(x) / len(x), 'ranking'))
+print('The average above/equal 10: ', my_table4_above10.aggregate(lambda x: sum(x) / len(x), 'ranking'))
 
-print("Test join: finding cities in non-EU countries whose temperatures are below 5.0")
-my_table2 = my_DB.search('countries')
-my_table3 = my_table1.join(my_table2, 'country')
-my_table3_filtered = my_table3.filter(lambda x: x['EU'] == 'no').filter(lambda x: float(x['temperature']) < 5.0)
-print(my_table3_filtered.table)
-print()
-print("Selecting just three fields, city, country, and temperature")
-print(my_table3_filtered.select(['city', 'country', 'temperature']))
-print()
+my_table3_forward = table3.filter(lambda x: x['position'] == 'forward')
+print('The average forward: ', my_table3_forward.aggregate(lambda x: sum(x) / len(x), 'passes'))
 
-print("Print the min and max temperatures for cities in EU that do not have coastlines")
-my_table3_filtered = my_table3.filter(lambda x: x['EU'] == 'yes').filter(lambda x: x['coastline'] == 'no')
-print("Min temp:", my_table3_filtered.aggregate(lambda x: min(x), 'temperature'))
-print("Max temp:", my_table3_filtered.aggregate(lambda x: max(x), 'temperature'))
-print()
+my_table3_midfielder = table3.filter(lambda x: x['position'] == 'midfielder')
+print('The average midfielder: ', my_table3_midfielder.aggregate(lambda x: sum(x) / len(x), 'passes'))
+# print("Test filter: only filtering out cities in Italy")
+# my_table1_filtered = my_table1.filter(lambda x: x['country'] == 'Italy')
+# print(my_table1_filtered)
+# print()
+#
+# print("Test select: only displaying two fields, city and latitude, for cities in Italy")
+# my_table1_selected = my_table1_filtered.select(['city', 'latitude'])
+# print(my_table1_selected)
+# print()
+#
+# print("Calculting the average temperature without using aggregate for cities in Italy")
+# temps = []
+# for item in my_table1_filtered.table:
+#     temps.append(float(item['temperature']))
+# print(sum(temps)/len(temps))
+# print()
+#
+# print("Calculting the average temperature using aggregate for cities in Italy")
+# print(my_table1_filtered.aggregate(lambda x: sum(x)/len(x), 'temperature'))
+# print()
+#
+# print("Test join: finding cities in non-EU countries whose temperatures are below 5.0")
+# my_table2 = my_DB.search('countries')
+# my_table3 = my_table1.join(my_table2, 'country')
+# my_table3_filtered = my_table3.filter(lambda x: x['EU'] == 'no').filter(lambda x: float(x['temperature']) < 5.0)
+# print(my_table3_filtered.table)
+# print()
+# print("Selecting just three fields, city, country, and temperature")
+# print(my_table3_filtered.select(['city', 'country', 'temperature']))
+# print()
+#
+# print("Print the min and max temperatures for cities in EU that do not have coastlines")
+# my_table3_filtered = my_table3.filter(lambda x: x['EU'] == 'yes').filter(lambda x: x['coastline'] == 'no')
+# print("Min temp:", my_table3_filtered.aggregate(lambda x: min(x), 'temperature'))
+# print("Max temp:", my_table3_filtered.aggregate(lambda x: max(x), 'temperature'))
+# print()
+#
+# print("Print the min and max latitude for cities in every country")
+# for item in my_table2.table:
+#     my_table1_filtered = my_table1.filter(lambda x: x['country'] == item['country'])
+#     if len(my_table1_filtered.table) >= 1:
+#         print(item['country'], my_table1_filtered.aggregate(lambda x: min(x), 'latitude'), my_table1_filtered.aggregate(lambda x: max(x), 'latitude'))
+# print()
 
-print("Print the min and max latitude for cities in every country")
-for item in my_table2.table:
-    my_table1_filtered = my_table1.filter(lambda x: x['country'] == item['country'])
-    if len(my_table1_filtered.table) >= 1:
-        print(item['country'], my_table1_filtered.aggregate(lambda x: min(x), 'latitude'),
-              my_table1_filtered.aggregate(lambda x: max(x), 'latitude'))
-print()
