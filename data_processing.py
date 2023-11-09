@@ -172,17 +172,29 @@ my_DB.insert(table3)
 my_DB.insert(table4)
 my_table1 = my_DB.search('cities')
 my_table3 = my_DB.search('players')
+my_table2 = my_DB.search('countries')
 my_table4 = my_DB.search('titanic')
 # print(my_table3.table_name, my_table3.table)
 
 
 
 
-
+print('----test case 1----')
 my_pivot = my_table4.pivot_table(['embarked', 'gender', 'class'], ['fare', 'fare', 'fare', 'last'], [lambda x: min(x), lambda x: max(x), lambda x: sum(x)/len(x), lambda x: len(x)])
 print(my_pivot)
 
+print('----test case 2----')
+my_pivot2 = my_table3.pivot_table(['position'], ['passes', 'shots'], [lambda x: sum(x)/len(x), lambda x: sum(x)/len(x)])
+print(my_pivot2)
 
+print('----test case 3----')
+my_table7 = my_table1.join(my_table2, 'country')
+my_pivot3 = my_table7.pivot_table(['EU', 'coastline'], ['temperature', 'latitude', 'latitude'], [lambda x: sum(x)/len(x), lambda x: min(x), lambda x:max(x)])
+print(my_pivot3)
+
+print('----test case 4----')
+my_pivot4 = my_table4.pivot_table(['class', 'gender', 'survived'], ['survived', 'fare'], [lambda x:len(x), lambda x: sum(x)/len(x)])
+print(my_pivot4)
 
 
 # print("Test filter: only filtering out cities in Italy")
