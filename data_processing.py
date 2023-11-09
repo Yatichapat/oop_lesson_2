@@ -96,13 +96,15 @@ table1 = Table('cities', cities)
 table2 = Table('countries', countries)
 table3 = Table('players', players)
 table4 = Table('teams', teams)
-table5 = Table('titanic', titanic)
+my_table5 = Table('titanic', titanic)
 my_DB = DB()
 my_DB.insert(table1)
 my_DB.insert(table2)
 my_DB.insert(table3)
+my_DB.insert(my_table5)
 my_table1 = my_DB.search('cities')
 my_table3 = my_DB.search('players')
+my_table5 = my_DB.search('titanic')
 # print(my_table3.table_name, my_table3.table)
 
 print(
@@ -126,19 +128,22 @@ print('The average forward: ', my_table3_forward.aggregate(lambda x: sum(x) / le
 my_table3_midfielder = table3.filter(lambda x: x['position'] == 'midfielder')
 print('The average midfielder: ', my_table3_midfielder.aggregate(lambda x: sum(x) / len(x), 'passes'))
 
-my_table5_first_class = table5.filter(lambda x: int(x['class']) == 1)
+my_table5_first_class = my_table5.filter(lambda x: int(x['class']) == 1)
 print('The average fare in first class: ', my_table5_first_class.aggregate(lambda x: sum(x)/len(x), 'fare'))
 
-my_table5_third_class = table5.filter(lambda x: int(x['class']) == 3)
+my_table5_third_class = my_table5.filter(lambda x: int(x['class']) == 3)
 print('The average fare in third class: ', my_table5_third_class.aggregate(lambda x: sum(x)/len(x), 'fare'))
 
-my_table5_M_survival = table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'M')
-my_table5_M_all = table5.filter(lambda x: x['gender'] == 'M')
-my_table5_FM_survival = table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'F')
-my_table5_FM_all = table5.filter(lambda x: x['gender'] == 'F')
+my_table5_M_survival = my_table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'M')
+my_table5_M_all = my_table5.filter(lambda x: x['gender'] == 'M')
+my_table5_FM_survival = my_table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'F')
+my_table5_FM_all = my_table5.filter(lambda x: x['gender'] == 'F')
 print('The rate of survival male: ', len(my_table5_M_survival.table)/len(my_table5_M_all.table))
 print('The rate of survival female: ', len(my_table5_FM_survival.table)/len(my_table5_FM_all.table))
 
+
+my_table5_M_southEmbark = my_table5.filter(lambda x: x['gender'] == 'M').filter(lambda x: x['embarked'] == 'Southampton')
+print("Total male embarked at Southampton: ", len(my_table5_M_southEmbark.table))
 
 
 # print("Test filter: only filtering out cities in Italy")
