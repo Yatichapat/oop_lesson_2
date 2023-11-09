@@ -102,56 +102,86 @@ class Table:
             temps.append(dict_temp)
         return temps
 
+    def pivot_table(self, keys_to_pivot_list, keys_to_aggregate_list, aggregate_func_list):
+
+        # First create a list of unique values for each key
+        unique_values_list = []
+
+        # Here is an example of unique_values_list for
+        # keys_to_pivot_list = ['embarked', 'gender', 'class']
+        # unique_values_list =
+        # [['Southampton', 'Cherbourg', 'Queenstown'], ['M', 'F'], ['3', '2','1']]
+
+        # Get the combination of unique_values_list
+        # You will make use of the function you implemented in Task 2
+
+        for pivot in keys_to_pivot_list:
+            my_table4_selected = self.select([pivot])
+            embark_list = []
+            for i in my_table4_selected:
+                for key, value in i.items():
+                    if value not in embark_list:
+                        embark_list.append(value)
+            unique_values_list.append(embark_list)
+
+        combine = combination_gen.gen_comb_list(unique_values_list)
+        list_list = []
+        for u in combine:
+            aggregate_value = []
+            now = copy.copy(self)
+            for kpv in range(len(u)):
+                now = now.filter(lambda x: x[keys_to_pivot_list[kpv]] == u[kpv])
+            for vpv in range(len(keys_to_aggregate_list)):
+                value = now.aggregate(aggregate_func_list[vpv], keys_to_aggregate_list[vpv])
+                aggregate_value.append(value)
+                list_list.append([u, aggregate_value])
+        return list_list
+
+
+        # code that makes a call to combination_gen.gen_comb_list
+
+        # Example output:
+        # [['Southampton', 'M', '3'],
+        #  ['Cherbourg', 'M', '3'],
+        #  ...
+        #  ['Queenstown', 'F', '1']]
+
+        # code that filters each combination
+
+        # for each filter table applies the relevant aggregate functions
+        # to keys to aggregate
+        # the aggregate functions is listed in aggregate_func_list
+        # to keys to aggregate is listed in keys_to_aggreagte_list
+
+        # return a pivot table
+
     def __str__(self):
         return self.table_name + ':' + str(self.table)
 
 
+import combination_gen
 table1 = Table('cities', cities)
 table2 = Table('countries', countries)
 table3 = Table('players', players)
-table4 = Table('teams', teams)
-table5 = Table('titanic', titanic)
+table4 = Table('titanic', titanic)
+# table5 = Table('titanic', titanic)
 my_DB = DB()
 my_DB.insert(table1)
 my_DB.insert(table2)
 my_DB.insert(table3)
+my_DB.insert(table4)
 my_table1 = my_DB.search('cities')
 my_table3 = my_DB.search('players')
+my_table4 = my_DB.search('titanic')
 # print(my_table3.table_name, my_table3.table)
 
-print(
-    'Test select:  player on a team with “ia” in the team name played less than 200 minutes and made more than 100 pass')
 
-my_table3_filtered = my_table3.filter(lambda x: int(x['minutes']) < 200).filter(
-    lambda x: int(x['passes']) > 100).filter(lambda x: 'ia' in x['team'])
-print(my_table3_filtered)
-print()
 
-my_table3_selected = my_table3_filtered.select(['surname', 'team', 'position'])
-print(my_table3_selected)
-my_table4_below10 = table4.filter(lambda x: int(x['ranking']) < 10)
-my_table4_above10 = table4.filter(lambda x: int(x['ranking']) >= 10)
-print('The average below 10: ', my_table4_below10.aggregate(lambda x: sum(x) / len(x), 'ranking'))
-print('The average above/equal 10: ', my_table4_above10.aggregate(lambda x: sum(x) / len(x), 'ranking'))
 
-my_table3_forward = table3.filter(lambda x: x['position'] == 'forward')
-print('The average forward: ', my_table3_forward.aggregate(lambda x: sum(x) / len(x), 'passes'))
 
-my_table3_midfielder = table3.filter(lambda x: x['position'] == 'midfielder')
-print('The average midfielder: ', my_table3_midfielder.aggregate(lambda x: sum(x) / len(x), 'passes'))
+my_pivot = my_table4.pivot_table(['embarked', 'gender', 'class'], ['fare', 'fare', 'fare', 'last'], [lambda x: min(x), lambda x: max(x), lambda x: sum(x)/len(x), lambda x: len(x)])
+print(my_pivot)
 
-my_table5_first_class = table5.filter(lambda x: int(x['class']) == 1)
-print('The average fare in first class: ', my_table5_first_class.aggregate(lambda x: sum(x)/len(x), 'fare'))
-
-my_table5_third_class = table5.filter(lambda x: int(x['class']) == 3)
-print('The average fare in third class: ', my_table5_third_class.aggregate(lambda x: sum(x)/len(x), 'fare'))
-
-my_table5_M_survival = table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'M')
-my_table5_M_all = table5.filter(lambda x: x['gender'] == 'M')
-my_table5_FM_survival = table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'F')
-my_table5_FM_all = table5.filter(lambda x: x['gender'] == 'F')
-print('The rate of survival male: ', len(my_table5_M_survival.table)/len(my_table5_M_all.table))
-print('The rate of survival female: ', len(my_table5_FM_survival.table)/len(my_table5_FM_all.table))
 
 
 
