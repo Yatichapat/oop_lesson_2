@@ -126,6 +126,22 @@ print('The average forward: ', my_table3_forward.aggregate(lambda x: sum(x) / le
 
 my_table3_midfielder = table3.filter(lambda x: x['position'] == 'midfielder')
 print('The average midfielder: ', my_table3_midfielder.aggregate(lambda x: sum(x) / len(x), 'passes'))
+
+my_table5_first_class = table5.filter(lambda x: int(x['class']) == 1)
+print('The average fare in first class: ', my_table5_first_class.aggregate(lambda x: sum(x)/len(x), 'fare'))
+
+my_table5_third_class = table5.filter(lambda x: int(x['class']) == 3)
+print('The average fare in third class: ', my_table5_third_class.aggregate(lambda x: sum(x)/len(x), 'fare'))
+
+my_table5_M_survival = table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'M')
+my_table5_M_all = table5.filter(lambda x: x['gender'] == 'M')
+my_table5_FM_survival = table5.filter(lambda x: x['survived'] == 'yes').filter(lambda x: x['gender'] == 'F')
+my_table5_FM_all = table5.filter(lambda x: x['gender'] == 'F')
+print('The rate of survival male: ', len(my_table5_M_survival.table)/len(my_table5_M_all.table))
+print('The rate of survival female: ', len(my_table5_FM_survival.table)/len(my_table5_FM_all.table))
+
+
+
 # print("Test filter: only filtering out cities in Italy")
 # my_table1_filtered = my_table1.filter(lambda x: x['country'] == 'Italy')
 # print(my_table1_filtered)
@@ -136,14 +152,14 @@ print('The average midfielder: ', my_table3_midfielder.aggregate(lambda x: sum(x
 # print(my_table1_selected)
 # print()
 #
-# print("Calculting the average temperature without using aggregate for cities in Italy")
+# print("Calculating the average temperature without using aggregate for cities in Italy")
 # temps = []
 # for item in my_table1_filtered.table:
 #     temps.append(float(item['temperature']))
 # print(sum(temps)/len(temps))
 # print()
 #
-# print("Calculting the average temperature using aggregate for cities in Italy")
+# print("Calculating the average temperature using aggregate for cities in Italy")
 # print(my_table1_filtered.aggregate(lambda x: sum(x)/len(x), 'temperature'))
 # print()
 #
