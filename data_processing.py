@@ -120,7 +120,6 @@ my_table4_above10 = table4.filter(lambda x: int(x['ranking']) >= 10)
 print('The average below 10: ', my_table4_below10.aggregate(lambda x: sum(x) / len(x), 'ranking'))
 print('The average above/equal 10: ', my_table4_above10.aggregate(lambda x: sum(x) / len(x), 'ranking'))
 
-
 my_table3_forward = table3.filter(lambda x: x['position'] == 'forward')
 print('The average forward: ', my_table3_forward.aggregate(lambda x: sum(x) / len(x), 'passes'))
 
